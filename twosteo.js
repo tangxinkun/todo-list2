@@ -1,8 +1,12 @@
 
-
+initStorage();
+alert("我执行完了第一个init");
+alert(localStorage.project);//为何这个projec没有了呢
 function clickProject(element) {
 
     // alert(element);
+    initStorage();
+    //alert(localStorage.project);
     oDiv = document.getElementById("project-list");
     cancelActive(oDiv, "")
     addClass(element, "active");
@@ -12,8 +16,8 @@ function clickProject(element) {
     //alert(oInit.oProject)
     oProject=getProject(); //获得所有的project
     //oTask   =getTask();    //获得所有的task
-    alert(typeof oProject);
-    alert(oProject);
+    //alert(typeof oProject);
+   // alert(oProject);
     //alert(oTask[0].id);
 }
 
@@ -61,20 +65,23 @@ function clickProject(element) {
         localStorage.project = JSON.stringify(projectJson);//stringify()用于从一个对象解析出字符串
 
         localStorage.task = JSON.stringify(taskJson);//stringify()用于从一个对象解析出字符串
-        alert(localStorage.project);
-        alert(localStorage.task);
+        return alert(localStorage.project);
+
     }
 
     function getProject() {
+        alert("1");
         initStorage();
-        //var sP=localStorage.project.reverse();
 
+        alert(typeof localStorage.project);
+        //return localStorage.project
+        //return JSON.parse(localStorage.project)
         return localStorage.project
-
     }
     function getTask() {
         initStorage();
-        return  JSON.parse(localStorage.task.reverse())
+        alert(localStorage.task);
+        return  JSON.parse(localStorage.task)
 
     }
 
@@ -92,9 +99,9 @@ function addClass(elem,newclassname) {
 function cancelActive(ele,oldclassname) {
 
 
-    alert(ele);
+    //alert(ele);
     oLi=ele.getElementsByTagName("li");
-    alert(oLi.length);
+    //alert(oLi.length);
     for(var i=0;i  <  oLi.length;i++){
 
        oLi[i].className="";
