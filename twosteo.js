@@ -24,7 +24,6 @@ function cancelActive(ele,oldclassname) {
     for(var i=0;i  <  oLi.length;i++){
 
        oLi[i].className="";
-
-    }
-
+   }
+  //just github
 }
