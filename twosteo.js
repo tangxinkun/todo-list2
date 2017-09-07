@@ -5,8 +5,11 @@ alert(localStorage.project);//为何这个projec没有了呢
 function clickProject(element) {
 
     // alert(element);
-    initStorage();
-    //alert(localStorage.project);
+    var sGetProstr=initStorage();
+    alert(sGetProstr);
+    oProject=getProject(sGetProstr);
+    alert(typeof oProject);
+    alert(oProject[0].name);
     oDiv = document.getElementById("project-list");
     cancelActive(oDiv, "")
     addClass(element, "active");
@@ -14,7 +17,7 @@ function clickProject(element) {
     //var oInit=new initStorage();
     //alert(typeof oInit);
     //alert(oInit.oProject)
-    oProject=getProject(); //获得所有的project
+    //oProject=getProject(); //获得所有的project
     //oTask   =getTask();    //获得所有的task
     //alert(typeof oProject);
    // alert(oProject);
@@ -65,18 +68,18 @@ function clickProject(element) {
         localStorage.project = JSON.stringify(projectJson);//stringify()用于从一个对象解析出字符串
 
         localStorage.task = JSON.stringify(taskJson);//stringify()用于从一个对象解析出字符串
-        return alert(localStorage.project);
+        return localStorage.project;
 
     }
 
-    function getProject() {
+    function getProject(ele) {
         alert("1");
-        initStorage();
+        //initStorage();
 
-        alert(typeof localStorage.project);
+        //alert(typeof localStorage.project);
         //return localStorage.project
-        //return JSON.parse(localStorage.project)
-        return localStorage.project
+        return JSON.parse(ele)
+        //return localStorage.project
     }
     function getTask() {
         initStorage();
