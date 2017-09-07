@@ -1,0 +1,242 @@
+!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Simple todo list</title>
+    <!--<link href="//netdna.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet">-->
+    <link href="css/font-awesome.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header>
+    <h2>My Todo List</h2>
+</header>
+
+<div id="left-view" class="on-test" onblur="blurLeft();" tabindex="0">
+    <div id="project-list">
+        <ul>
+            <li id="project-0" data-projectid="0" onclick="clickProject(this)">
+                <i class="fa fa-bars"></i><span>学习前端</span>
+                <i class="fa fa-ellipsis-h" onclick="showDropdownMenu(this);"></i>
+            </li>
+            <li id="project-1" data-projectid="-1" onclick="clickProject(this)">
+                <i class="fa fa-bars"></i><span>娱乐</span>
+                <i class="fa fa-ellipsis-h" onclick="showDropdownMenu(this);"></i>
+            </li>
+            <li onclick="addProject()">
+                <i class="fa fa-plus-circle"></i><span>创建清单</span>
+            </li>
+        </ul>
+    </div>
+    <div id="project-dropdown-menu">
+        <ul>
+            <li onclick="editProjectName();">编辑</li>
+            <li onclick="deleteProject();">删除</li>
+        </ul>
+    </div>
+</div>
+</body>
+</html>
+<script>
+    var currentProjectId = 0;
+    var currentTaskId = -1;
+    function clickProject(element) {
+
+        cancelActive(document.getElementById("project-list"));
+        addClass(element, "active");
+
+
+    }
+
+    function cancelActive(element) {
+        var lists = element.getElementsByTagName("li");
+        for (var i = 0; i < lists.length; i++) {
+            removeClass(lists[i], "active");//
+        }
+    }
+    function removeClass(element, oldClassName) {
+        if (element.classList) {
+            element.classList.remove(oldClassName);
+        }
+
+        /*
+        else if (hasClass(element, oldClassName)) {
+            var re = new RegExp('(\\s|^)' + oldClassName + '(\\s|$)');
+            element.className = element.className.replace(re, ' ');
+        }
+        */
+    }
+    function hasClass(element, className) {
+        if (element.classList) {
+            return element.classList.contains(className);
+        }
+    /*
+    var re = new RegExp('(\\s|^)' + className + '(\\s|$)');
+     return !!element.match(re);
+     */
+ }
+
+ // 为element增加一个样式名为newClassName的新样式
+ function addClass(element, newClassName) {
+     if (element.classList) {
+         element.classList.add(newClassName);
+     } else if (!hasClass(element, newClassName)) {
+         element.className += " " + newClassName;
+     }
+ }
+ function showDropdownMenu(element) {
+        var menuElement = document.getElementById("project-dropdown-menu");
+        var menuStyle = menuElement.style;
+
+        if (menuStyle.display == "block") {
+            var distance = parseInt(menuStyle.top) - parseInt(element.offsetTop);
+            if (distance - 30 == 0) {
+                menuStyle.display = "none";
+                return;
+            }
+        }
+
+        // 将下拉菜单定位
+        var top = element.offsetTop;
+        var left = element.offsetLeft;
+        menuStyle.position = "absolute";
+
+        menuStyle.display = "block";
+        menuStyle.top = top + 30+ "px";
+        menuStyle.left = left - 30 + "px";
+    }
+    function editProjectName() {
+        hideDropdownMenu();
+        var index = -1;
+
+        var projectArray = getProject();
+        for (var i = 0; i < projectArray.length; i++) {
+            if (projectArray[i].id == currentProjectId) {
+                index = i;
+                break;
+            }
+        }
+
+        var name = prompt("请输入新的名称：", projectArray[index].name);
+        if (!name) return;
+
+        projectArray[index].name = name;
+
+        updateProject(projectArray);
+        showProject();
+        // 将焦点定位至改名后的目录
+        var newProject = document.getElementById("project-" + currentProjectId);
+        clickProject(newProject);
+    }
+
+    function hideDropdownMenu() {
+        var menuElement = document.getElementById("project-dropdown-menu");
+        var menuStyle = menuElement.style;
+        menuStyle.display = "none";
+    }
+
+    function updateProject(projects) {
+        localStorage.project = JSON.stringify(projects);
+    }
+    function showProject() {
+        var projectArray = getProject();
+        var projectHTML = "<ul>";
+        var liStr;
+        for (var i = 0; i < projectArray.length; i++) {
+            var id = projectArray[i].id;
+            liStr = '<li id="project-'
+                + id + '" data-projectid=' + id + ' onclick="clickProject(this)">'
+                + '<i class="fa fa-bars"></i>'
+                + '<span>'
+                + projectArray[i].name
+                + '</span><i class="fa fa-ellipsis-h" onclick="showDropdownMenu(this);"></i></li>';
+            projectHTML += liStr;
+        }
+        projectHTML += '<li onclick="addProject()"><i class="fa fa-plus-circle"></i><span>创建清单</span></li></ul>';
+        document.getElementById("project-list").innerHTML = projectHTML;
+    }
+    function clickProject(element) {
+
+        cancelActive(document.getElementById("project-list"));
+        addClass(element, "active");
+
+        var newProjectId = element.getAttribute("data-projectid");
+
+        // 如果选中的是不同的目录
+        if (currentProjectId !== newProjectId) {
+            currentTaskId = -1;
+            currentProjectId = newProjectId;
+        }
+
+        addClass(document.getElementById("content-mask"), "not-selected");
+
+        var projectName = "";
+        var projectArray = getProject();
+        for (var i = 0; i < projectArray.length; i++) {
+            if (projectArray[i].id == currentProjectId) {
+                projectName = projectArray[i].name;
+                break;
+            }
+        }
+        var titleElement = document.getElementById("project-name").getElementsByTagName("h3")[0];
+        titleElement.innerHTML = projectName;
+        // 修改输入框内的提示信息
+        document.getElementById("add-task-input").setAttribute("placeholder",
+            '添加任务至"' + projectName + '"');
+        // 修改显示的任务列表
+        showTaskList();
+    }
+    function showTaskList() {
+        document.getElementById("task-list").innerHTML = createProjectTaskList(currentProjectId);
+    }
+
+    // 创建一个目录下的列表用于显示
+    function createProjectTaskList(projectId) {
+        var unfinishedListHTML = "<ul>";
+        var finishedListHTML = '<div id="finished-task"><h5>已完成</h5>';
+
+        var tasksArray = getTask();
+        tasksArray = tasksArray.reverse();
+
+        var liStr;
+        for (var i = 0; i < tasksArray.length; i++) {
+            if (tasksArray[i].parent == projectId) {
+                if (!tasksArray[i].finish) {
+
+                    liStr = '<li' + ' data-taskid="' + tasksArray[i].id + '" '
+                        + 'class="title-list"'
+                        + ' onclick="clickTask(this);">'
+                        + '<i class="fa fa-fw fa-square-o" onclick="checkTask(this);"></i>'
+                        + '<span class="task-title">'
+                        + tasksArray[i].title
+                        + '</span>'
+                        + '<i class="fa fa-edit" onclick="editTaskTitle(this);"></i></li>';
+                    unfinishedListHTML += liStr;
+                } else {
+
+                    liStr = '<li' + ' data-taskid="' + tasksArray[i].id + '" '
+                        + 'class="title-list finished"'
+                        + ' onclick="clickTask(this);">'
+                        + '<i class="fa fa-fw fa-check-square-o" onclick="checkTask(this);"></i>'
+                        + '<span class="task-title">'
+                        + tasksArray[i].title
+                        + '</span>'
+                        + '<i class="fa fa-edit" onclick="editTaskTitle(this);"></i></li>';
+                    finishedListHTML += liStr;
+                }
+            }
+        }
+        unfinishedListHTML += "</ul>";
+        finishedListHTML += "</ul></div>";
+
+        return unfinishedListHTML + finishedListHTML;
+    }
+    function cancelActive(element) {
+        var lists = element.getElementsByTagName("li");
+        for (var i = 0; i < lists.length; i++) {
+            removeClass(lists[i], "active");//删除制定dom元素的样式
+        }
+    }
+
+</script>
