@@ -1,37 +1,41 @@
+var currentProjectId=0;
+var sProject=initGetProject();//获得字符串项目列表
+alert(sProject);
+var sTask  =initGetTask(); //获得字符串任务列表
+alert(sTask);
 
-initStorage();
-alert("我执行完了第一个init");
-alert(localStorage.project);//为何这个projec没有了呢
 function clickProject(element) {
 
     // alert(element);
-    var sGetProstr=initStorage();
-    alert(sGetProstr);
-    oProject=getProject(sGetProstr);
-    alert(typeof oProject);
-    alert(oProject[0].name);
+    oProject=getObejectProject();//获得project对象
+    //alert(typeof oProject);
+    //alert(oProject[0].name);
+    oTask  =getObjectTask();//获得task对象
+    //alert(oTask.length);
+    //alert(typeof oTask);
+    //alert(oTask[1].id);
     oDiv = document.getElementById("project-list");
     cancelActive(oDiv, "")
     addClass(element, "active");
-    //element.className="active"
-    //var oInit=new initStorage();
-    //alert(typeof oInit);
-    //alert(oInit.oProject)
-    //oProject=getProject(); //获得所有的project
-    //oTask   =getTask();    //获得所有的task
-    //alert(typeof oProject);
-   // alert(oProject);
-    //alert(oTask[0].id);
+    var nClickProjectNumber=element.getAttribute("data-projectid");
+    if (currentProjectId !== nClickProjectNumber) {
+        currentProjectId = nClickProjectNumber; //把当前的data-projectid保存成currentProjectId
+    }
+    alert(currentProjectId);
+    var titleElement = document.getElementById("project-name").getElementsByTagName("h3")[0];
+    alert(oProject[currentProjectId].id);
+    titleElement.innerHTML=oProject[currentProjectId].name
+    showTaskList(oTask);
+
+    //alert(nClickProjectNumer);
+
 }
+function initGetProject() {
 
-    function initStorage() {
 
-
-        var localStorage = new Object();
-        localStorage.project = 0;
-        localStorage.task = 0;
-
-        var projectJson = [{
+    var localProject = new Object();
+        localProject.project = 0;
+    var projectJson = [{
             "id": 0,
             "name": "学习前端",
             "child": [0, 1]
@@ -40,8 +44,19 @@ function clickProject(element) {
             "name": "娱乐",
             "child": [2]
         }];
+    localStorage.project = JSON.stringify(projectJson);//stringify()用于从一个对象解析出字符串
+    JSON.parse(localStorage.project);
+    return localStorage.project;
+    }
+function getObejectProject() {
 
-        var taskJson = [{
+    return JSON.parse(sProject)
+
+}
+function initGetTask() {
+    var localTask=new Object();
+    localTask.task=0;
+    var taskJson = [{
             "id": 0,
             "parent": 0,
             "finish": false,
@@ -64,34 +79,13 @@ function clickProject(element) {
             "due-date": null
         }
         ];
-
-        localStorage.project = JSON.stringify(projectJson);//stringify()用于从一个对象解析出字符串
-
-        localStorage.task = JSON.stringify(taskJson);//stringify()用于从一个对象解析出字符串
-        return localStorage.project;
-
+    localTask.task=JSON.stringify(taskJson);
+    return localTask.task
     }
+function getObjectTask() {
+    return JSON.parse(sTask)
 
-    function getProject(ele) {
-        alert("1");
-        //initStorage();
-
-        //alert(typeof localStorage.project);
-        //return localStorage.project
-        return JSON.parse(ele)
-        //return localStorage.project
-    }
-    function getTask() {
-        initStorage();
-        alert(localStorage.task);
-        return  JSON.parse(localStorage.task)
-
-    }
-
-        //return alert("1");
-        //return alert(2);
-
-
+}
 function addClass(elem,newclassname) {
 
    // alert(newclassname);
@@ -111,5 +105,51 @@ function cancelActive(ele,oldclassname) {
    }
   //just github
 }
-
 //新建project列表和task列表
+function showTaskList(element) {
+    document.getElementById("task-list").innerHTML = createProjectTaskList(currentProjectId,element);//将tasklist的innerhtml重建
+}
+
+// 创建一个目录下的列表用于显示
+function createProjectTaskList(projectId,oTask) {
+    var unfinishedListHTML = "<ul>";
+    var finishedListHTML = '<div id="finished-task"><h5>已完成</h5>';
+
+    //var tasksArray = getTask(); //task的obj拿过来
+   // alert(tasksArray);
+    //tasksArray = tasksArray.reverse();//
+
+    var liStr;
+    for (var i = 0; i < oTask.length; i++) {
+        if (oTask[i].parent == currentProjectId) {//parent对应projectID
+            if (!oTask[i].finish) {  //如果finish了
+
+                liStr = '<li' + ' data-taskid="' + oTask[i].id + '" '
+                    + 'class="title-list"'
+                    + ' onclick="clickTask(this);">'
+                    + '<i class="fa fa-fw fa-square-o" onclick="checkTask(this);"></i>'
+                    + '<span class="task-title">'
+                    + oTask[i].title
+                    + '</span>'
+                    + '<i class="fa fa-edit" onclick="editTaskTitle(this);"></i></li>';
+                unfinishedListHTML += liStr;
+            } else {  //如果没有finish
+
+                liStr = '<li' + ' data-taskid="' + oTask[i].id + '" '
+                    + 'class="title-list finished"'
+                    + ' onclick="clickTask(this);">'
+                    + '<i class="fa fa-fw fa-check-square-o" onclick="checkTask(this);"></i>'
+                    + '<span class="task-title">'
+                    + oTask[i].title
+                    + '</span>'
+                    + '<i class="fa fa-edit" onclick="editTaskTitle(this);"></i></li>';
+                finishedListHTML += liStr;
+            }
+        }
+    }
+    unfinishedListHTML += "</ul>";
+    finishedListHTML += "</ul></div>";
+
+    return unfinishedListHTML + finishedListHTML;
+}
+
