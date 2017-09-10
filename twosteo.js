@@ -29,7 +29,7 @@ function clickProject(element) {
 
     //alert(nClickProjectNumer);
 
-}
+}//点击项目列表
 function initGetProject() {
 
 
@@ -47,12 +47,12 @@ function initGetProject() {
     localStorage.project = JSON.stringify(projectJson);//stringify()用于从一个对象解析出字符串
     JSON.parse(localStorage.project);
     return localStorage.project;
-    }
+    }//获得项目列表
 function getObejectProject() {
 
     return JSON.parse(sProject)
 
-}
+}//获得项目对象
 function initGetTask() {
     var localTask=new Object();
     localTask.task=0;
@@ -81,18 +81,18 @@ function initGetTask() {
         ];
     localTask.task=JSON.stringify(taskJson);
     return localTask.task
-    }
+    }//获得任务列表
 function getObjectTask() {
     return JSON.parse(sTask)
 
-}
+}//获得项目对象
 function addClass(elem,newclassname) {
 
    // alert(newclassname);
     elem.className="active";
    // elem.className="newclassname"; 如何在newclass两头加上双引号
 
-}
+}//增加样式
 function cancelActive(ele,oldclassname) {
 
 
@@ -104,11 +104,11 @@ function cancelActive(ele,oldclassname) {
        oLi[i].className="";
    }
   //just github
-}
+}//取消样式
 //新建project列表和task列表
 function showTaskList(element) {
     document.getElementById("task-list").innerHTML = createProjectTaskList(currentProjectId,element);//将tasklist的innerhtml重建
-}
+}//点击项目，显示任务列表
 
 // 创建一个目录下的列表用于显示
 function createProjectTaskList(projectId,oTask) {
@@ -151,5 +151,22 @@ function createProjectTaskList(projectId,oTask) {
     finishedListHTML += "</ul></div>";
 
     return unfinishedListHTML + finishedListHTML;
-}
+}//创建任务列表
+function addProject() {
+    var name=prompt("请输入项目名称");
+    //alert(name);
+    var oNewProject={};
+    oNewProject.name=name;
+    oNewProject.child=[];
+    oNewProject.id=sProject.length;
+    oProject=getObejectProject();
+    alert(oProject);
+    alert(oNewProject);
+    oProject.push(oNewProject);
+    //oNewProject.push(oProject);
+    alert(oProject)
 
+
+
+
+}

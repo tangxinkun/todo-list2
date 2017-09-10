@@ -374,6 +374,8 @@ function addProject() {
     }
     projectObject.name = name;
     projectObject.child = [];
+    alert(projectObject);
+    alert(projectArray);
     projectArray.push(projectObject);
 
     updateProject(projectArray);
