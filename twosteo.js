@@ -1,12 +1,12 @@
 var currentProjectId=0;
 var sProject=initGetProject();//获得字符串项目列表
-alert(sProject);
+//alert(sProject);
 var sTask  =initGetTask(); //获得字符串任务列表
-alert(sTask);
+//alert(sTask);
 
 function clickProject(element) {
 
-    // alert(element);
+    //fdalert(element.name);
     oProject=getObejectProject();//获得project对象
     //alert(typeof oProject);
     //alert(oProject[0].name);
@@ -18,13 +18,16 @@ function clickProject(element) {
     cancelActive(oDiv, "")
     addClass(element, "active");
     var nClickProjectNumber=element.getAttribute("data-projectid");
+    alert(nClickProjectNumber);
     if (currentProjectId !== nClickProjectNumber) {
         currentProjectId = nClickProjectNumber; //把当前的data-projectid保存成currentProjectId
     }
-    alert(currentProjectId);
+    //alert(currentProjectId);
+    //alert(oProject[currentProjectId].id);
+    //alert(oProject[currentProjectId].name);
     var titleElement = document.getElementById("project-name").getElementsByTagName("h3")[0];
-    alert(oProject[currentProjectId].id);
-    titleElement.innerHTML=oProject[currentProjectId].name
+    //alert(oProject[currentProjectId].id);
+    titleElement.innerHTML=oProject[currentProjectId].name;
     showTaskList(oTask);
 
     //alert(nClickProjectNumer);
@@ -86,13 +89,34 @@ function getObjectTask() {
     return JSON.parse(sTask)
 
 }//获得项目对象
-function addClass(elem,newclassname) {
+/*function addClass(elem,newclassname) {
 
    // alert(newclassname);
     elem.className="active";
    // elem.className="newclassname"; 如何在newclass两头加上双引号
 
 }//增加样式
+
+*/
+
+
+function hasClass(element, className) {
+    if (element.classList) {
+        return element.classList.contains(className);
+    }
+    var re = new RegExp('(\\s|^)' + className + '(\\s|$)');
+    return !!element.match(re);
+}
+
+// 为element增加一个样式名为newClassName的新样式
+function addClass(element, newClassName) {
+    if (element.classList) {
+        element.classList.add(newClassName);
+    } else if (!hasClass(element, newClassName)) {
+        element.className += " " + newClassName;
+    }
+}
+
 function cancelActive(ele,oldclassname) {
 
 
@@ -154,19 +178,58 @@ function createProjectTaskList(projectId,oTask) {
 }//创建任务列表
 function addProject() {
     var name=prompt("请输入项目名称");
-    //alert(name);
     var oNewProject={};
     oNewProject.name=name;
     oNewProject.child=[];
-    oNewProject.id=sProject.length;
+    //alert(oNewProject.name);
     oProject=getObejectProject();
-    alert(oProject);
-    alert(oNewProject);
+    oNewProject.id=oProject[oProject.length - 1].id + 1;
+    //alert(oNewProject.id);
     oProject.push(oNewProject);
-    //oNewProject.push(oProject);
-    alert(oProject)
+    oProject2=JSON.stringify(oProject);
+    oProject3=JSON.parse(oProject2);
+    //alert(oProject3[0].name);
+    //alert(oProject3[0].id);
+    //alert(oProject3==oProject);
+    //alert(oProject3[oNewProject.id].name);
+    //alert(oProject3[oNewProject.id].id);
+    var projectHTML = "<ul>";
+    var liStr;
+    for (var i = 0; i < oProject3.length; i++) {
+        var id = oProject3[i].id;
+        //alert(oProject3[i].name);
+        liStr = '<li id="project-'
+            + id + '" data-projectid=' + id + ' onclick="clickProject(this)">'
+            + '<i class="fa fa-bars"></i>'
+            + '<span>'
+            + oProject3[i].name
+            + '</span><i class="fa fa-ellipsis-h" onclick="showDropdownMenu(this);"></i></li>';
+        projectHTML += liStr;
+    }
+    projectHTML += '<li onclick="addProject()"><i class="fa fa-plus-circle"></i><span>创建清单</span></li></ul>';
+    document.getElementById("project-list").innerHTML = projectHTML;
+    var newOp=document.getElementById("project-"+oNewProject.id);
+    alert(typeof newOp);
+    alert(newOp.id);
+    //alert(newOp.name);
+    clickProject(newOp)
 
+}
 
-
-
+function showProject() {
+    var projectArray = getProject();
+    var projectHTML = "<ul>";
+    var liStr;
+    for (var i = 0; i < projectArray.length; i++) {
+        var id = projectArray[i].id;
+        liStr = '<li id="project-'
+            + id + '" data-projectid=' + id + ' onclick="clickProject(this)">'
+            + '<i class="fa fa-bars"></i>'
+            + '<span>'
+            + projectArray[i].name
+            + '</span><i class="fa fa-ellipsis-h" onclick="showDropdownMenu(this);"></i></li>';
+        projectHTML += liStr;
+    }
+    projectHTML += '<li onclick="addProject()"><i class="fa fa-plus-circle"></i><span>创建清单</span></li></ul>';
+    document.getElementById("project-list").innerHTML = projectHTML;
 }

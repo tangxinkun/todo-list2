@@ -2,6 +2,7 @@ var currentProjectId = 0;
 var currentTaskId = -1;
 
 initStorage();
+alert(localStorage.project);
 showProject();
 document.getElementById("task-list").innerHTML = createProjectTaskList(0);
 
