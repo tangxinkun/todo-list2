@@ -1,12 +1,12 @@
-var currentProjectId=0;
-var sProject=initGetProject();//获得字符串项目列表
-alert(sProject);
-var sTask  =initGetTask(); //获得字符串任务列表
-alert(sTask);
+var currentProjectId=-1;
+initGetProject();//获得字符串项目列表str类型 localstage.project
+alert(localStorage.project);
+initGetTask(); //获得字符串任务列表string localstage.task
+alert(localStorage.task);
 
 function clickProject(element) {
 
-    // alert(element);
+
     oProject=getObejectProject();//获得project对象
     //alert(typeof oProject);
     //alert(oProject[0].name);
@@ -24,7 +24,9 @@ function clickProject(element) {
     alert(currentProjectId);
     var titleElement = document.getElementById("project-name").getElementsByTagName("h3")[0];
     alert(oProject[currentProjectId].id);
-    titleElement.innerHTML=oProject[currentProjectId].name
+    titleElement.innerHTML=oProject[currentProjectId].name;
+    document.getElementById("add-task-input").setAttribute("placeholder",
+        '添加任务至"' + oProject[currentProjectId].name + '"');
     showTaskList(oTask);
 
     //alert(nClickProjectNumer);
@@ -45,12 +47,11 @@ function initGetProject() {
             "child": [2]
         }];
     localStorage.project = JSON.stringify(projectJson);//stringify()用于从一个对象解析出字符串
-    JSON.parse(localStorage.project);
-    return localStorage.project;
-    }//获得项目列表
+
+    }//获得项目列表string
 function getObejectProject() {
 
-    return JSON.parse(sProject)
+    return JSON.parse(localStorage.project)
 
 }//获得项目对象
 function initGetTask() {
@@ -79,11 +80,10 @@ function initGetTask() {
             "due-date": null
         }
         ];
-    localTask.task=JSON.stringify(taskJson);
-    return localTask.task
-    }//获得任务列表
+    localStorage.task=JSON.stringify(taskJson);
+    }//获得任务列表string
 function getObjectTask() {
-    return JSON.parse(sTask)
+    return JSON.parse(localStorage.task)
 
 }//获得项目对象
 function addClass(elem,newclassname) {
@@ -155,18 +155,70 @@ function createProjectTaskList(projectId,oTask) {
 function addProject() {
     var name=prompt("请输入项目名称");
     //alert(name);
+    oProject=getObejectProject();//获取对象
     var oNewProject={};
     oNewProject.name=name;
     oNewProject.child=[];
-    oNewProject.id=sProject.length;
-    oProject=getObejectProject();
-    alert(oProject);
-    alert(oNewProject);
-    oProject.push(oNewProject);
+    oNewProject.id=oProject[oProject.length-1].id+1;
+    oProject.push(oNewProject);//添加新对象
+    updateProject(oProject);//更新localstorge.project
+    showProject();
     //oNewProject.push(oProject);
-    alert(oProject)
+    //alert(oProject)
+    addedproject=document.getElementById("project-" + oNewProject.id);
+    clickProject(addedproject);
+}
+function updateProject(projects) {
+    localStorage.project = JSON.stringify(projects);
+}//更新localstorge.project
+function updateTask(tasks) {
 
-
-
+    localStorage.project = JSON.stringify(tasks);
 
 }
+function showProject() {
+    var projectArray = getObejectProject();;
+    var projectHTML = "<ul>";
+    var liStr;
+    for (var i = 0; i < projectArray.length; i++) {
+        var id = projectArray[i].id;
+        liStr = '<li id="project-'
+            + id + '" data-projectid=' + id + ' onclick="clickProject(this)">'
+            + '<i class="fa fa-bars"></i>'
+            + '<span>'
+            + projectArray[i].name
+            + '</span><i class="fa fa-ellipsis-h" onclick="showDropdownMenu(this);"></i></li>';
+        projectHTML += liStr;
+    }
+    projectHTML += '<li onclick="addProject()"><i class="fa fa-plus-circle"></i><span>创建清单</span></li></ul>';
+    document.getElementById("project-list").innerHTML = projectHTML;
+}
+document.getElementById("add-task-input").onkeydown=function (event) {
+    if (event.keyCode == 13) {
+        if (this.value === "") {return;}
+        if (currentProjectId === -1) {
+            alert("请选择一个目录后再操作");
+            return;
+        }
+        var title = this.value;
+        alert(this);
+        alert(title);
+        this.value = "";
+        var taskObject = {};
+        taskObject.finish = false;
+        taskObject.title = title;
+        taskObject.parent = currentProjectId;
+        alert(taskObject.parent);
+        alert(typeof taskObject);
+        addTask(taskObject);
+        oTask=getObjectTask();
+        showTaskList(oTask);
+    }
+}
+function addTask(ele) {
+    oTask=getObjectTask();
+    oTask.push(ele);
+    updateTask(oTask);
+    alert(localStorage.task)
+}
+

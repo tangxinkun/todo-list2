@@ -2,6 +2,8 @@ var currentProjectId = 0;
 var currentTaskId = -1;
 
 initStorage();
+alert(localStorage.project);
+alert(localStorage.task);
 showProject();
 document.getElementById("task-list").innerHTML = createProjectTaskList(0);
 
@@ -110,6 +112,8 @@ document.getElementById("add-task-input").onkeydown = function(event) {
             return;
         }
         var title = this.value;
+        alert(this);
+        alert(title);
         this.value = "";
 
         var taskObject = {};
