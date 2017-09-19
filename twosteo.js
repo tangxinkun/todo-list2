@@ -201,23 +201,33 @@ document.getElementById("add-task-input").onkeydown=function (event) {
             return;
         }
         var title = this.value;
-        alert(this);
-        alert(title);
+        //alert(this);
+        //alert(title);
         this.value = "";
         var taskObject = {};
-        taskObject.finish = false;
-        taskObject.title = title;
-        taskObject.parent = currentProjectId;
-        alert(taskObject.parent);
-        alert(typeof taskObject);
-        addTask(taskObject);
-        oTask=getObjectTask();
-        showTaskList(oTask);
+        taskObject.finish = false;//新建未完成任务
+        taskObject.title = title;//title变成输入的字符串
+        taskObject.parent = currentProjectId;//id变成点击的currentID
+        //alert(taskObject.parent);
+        //alert(typeof taskObject);
+        addTask(taskObject);//将这个task对象加到task对象组里面，同时更新task字符串组
+        oTask=getObjectTask();//这是获得task对象站
+        showTaskList(oTask);//展示task
     }
 }
 function addTask(ele) {
-    oTask=getObjectTask();
+    alert(ele.parent);
+    oTask=getObjectTask();//获得task对象
+    alert(oTask);
+    ele.id = oTask[oTask.length - 1].id + 1;
     oTask.push(ele);
+    var oProject=getObejectProject();
+    for (var i = 0; i < oProject.length; i++) {
+        if (oProject[i].id == ele.parent) {
+            alert(ele.id);
+            oProject[i].child.push(ele.id);
+        }
+    }
     updateTask(oTask);
     alert(localStorage.task)
 }
